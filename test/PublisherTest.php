@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\App;
 use \Mockery;
 use Bschmitt\Amqp\Publisher;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPSSLConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 /**
  * @author Björn Schmitt <code@bjoern.io>
@@ -18,7 +18,7 @@ class PublisherTest extends BaseTestCase
      */
     private $publisherMock;
     /**
-     * @var AMQPSSLConnection
+     * @var AMQPStreamConnection
      */
     private $connectionMock;
     /**
@@ -35,7 +35,7 @@ class PublisherTest extends BaseTestCase
         $this->publisherMock = Mockery::mock(Publisher::class . '[connect]', [$this->configRepository]);
         // set connection and channel properties
         $this->channelMock = Mockery::mock(AMQPChannel::class);
-        $this->connectionMock = Mockery::mock(AMQPSSLConnection::class);
+        $this->connectionMock = Mockery::mock(AMQPStreamConnection::class);
         // channel and connection are both protected and without changing the source this was the only way to mock them
         $this->setProtectedProperty(Publisher::class, $this->publisherMock, 'channel', $this->channelMock);
         $this->setProtectedProperty(Publisher::class, $this->publisherMock, 'connection', $this->connectionMock);

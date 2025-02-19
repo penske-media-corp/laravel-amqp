@@ -6,7 +6,7 @@ use Bschmitt\Amqp\Exception\Configuration;
 use \Mockery;
 use Bschmitt\Amqp\Request;
 use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPSSLConnection;
+use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class RequestTest extends BaseTestCase
 {
@@ -19,7 +19,7 @@ class RequestTest extends BaseTestCase
         parent::setUp();
 
         $this->channelMock = Mockery::mock(AMQPChannel::class);
-        $this->connectionMock = Mockery::mock(AMQPSSLConnection::class);
+        $this->connectionMock = Mockery::mock(AMQPStreamConnection::class);
         // partial mock of \Bschmitt\Amqp\Publisher
         // we want all methods except [connect,getChannel] to be real
         $this->requestMock = Mockery::mock(Request::class . '[connect,getChannel]', [$this->configRepository]);

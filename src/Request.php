@@ -2,8 +2,9 @@
 
 namespace Bschmitt\Amqp;
 
+use PhpAmqpLib\Connection\AMQPConnectionConfig;
+use PhpAmqpLib\Connection\AMQPConnectionFactory;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
-use PhpAmqpLib\Connection\AMQPSSLConnection;
 use PhpAmqpLib\Channel\AMQPChannel;
 
 /**
@@ -32,36 +33,60 @@ class Request extends Context
      */
     public function connect()
     {
-        if ($this->getProperty('ssl_options')) {
-            $this->connection = new AMQPSSLConnection(
-                $this->getProperty('host'),
-                $this->getProperty('port'),
-                $this->getProperty('username'),
-                $this->getProperty('password'),
-                $this->getProperty('vhost'),
-                $this->getProperty('ssl_options'),
-                $this->getProperty('connect_options')
-            );
-        } else {
-            $this->connection = new AMQPStreamConnection(
-                $this->getProperty('host'),
-                $this->getProperty('port'),
-                $this->getProperty('username'),
-                $this->getProperty('password'),
-                $this->getProperty('vhost'),
-                $this->getConnectOption('insist', false),
-                $this->getConnectOption('login_method', 'AMQPLAIN'),
-                $this->getConnectOption('login_response', null),
-                $this->getConnectOption('locale', 3),
-                $this->getConnectOption('connection_timeout', 3.0),
-                $this->getConnectOption('read_write_timeout', 130),
-                $this->getConnectOption('context', null),
-                $this->getConnectOption('keepalive', false),
-                $this->getConnectOption('heartbeat', 60),
-                $this->getConnectOption('channel_rpc_timeout', 0.0),
-                $this->getConnectOption('ssl_protocol', null)
-            );
-        }
+        // if ($this->getProperty('ssl_options')) {
+        //     $this->connection = new AMQPSSLConnection(
+        //         $this->getProperty('host'),
+        //         $this->getProperty('port'),
+        //         $this->getProperty('username'),
+        //         $this->getProperty('password'),
+        //         $this->getProperty('vhost'),
+        //         $this->getProperty('ssl_options'),
+        //         $this->getProperty('connect_options')
+        //     );
+        // } else {
+        //     $this->connection = new AMQPStreamConnection(
+        //         $this->getProperty('host'),
+        //         $this->getProperty('port'),
+        //         $this->getProperty('username'),
+        //         $this->getProperty('password'),
+        //         $this->getProperty('vhost'),
+        //         $this->getConnectOption('insist', false),
+        //         $this->getConnectOption('login_method', 'AMQPLAIN'),
+        //         $this->getConnectOption('login_response', null),
+        //         $this->getConnectOption('locale', 3),
+        //         $this->getConnectOption('connection_timeout', 3.0),
+        //         $this->getConnectOption('read_write_timeout', 130),
+        //         $this->getConnectOption('context', null),
+        //         $this->getConnectOption('keepalive', false),
+        //         $this->getConnectOption('heartbeat', 60),
+        //         $this->getConnectOption('channel_rpc_timeout', 0.0),
+        //         $this->getConnectOption('ssl_protocol', null)
+        //     );
+        // }
+
+        $config = new AMQPConnectionConfig();
+
+        $config->setHost($this->getProperty('host'));
+        $config->setPort($this->getProperty('port'));
+        $config->setUser($this->getProperty('username'));
+        $config->setPassword($this->getProperty('password'));
+        $config->setVhost($this->getProperty('vhost'));
+
+        $config->setIoType($this->getConnectOption('io_type', AMQPConnectionConfig::IO_TYPE_STREAM));
+        $config->setInsist($this->getConnectOption('insist', false));
+        $config->setLoginMethod($this->getConnectOption('login_method', AMQPConnectionConfig::AUTH_AMQPPLAIN));
+        $config->setLoginResponse($this->getConnectOption('login_response', null));
+        $config->setLocale($this->getConnectOption('locale', 'en_US'));
+        $config->setConnectionTimeout($this->getConnectOption('connection_timeout', 3.0));
+        $config->setReadTimeout($this->getConnectOption('read_timeout', 3.0));
+        $config->setWriteTimeout($this->getConnectOption('write_timeout', 3.0));
+        $config->setKeepalive($this->getConnectOption('keepalive', false));
+        $config->setHeartbeat($this->getConnectOption('heartbeat', 0));
+
+        $config->setStreamContext($this->getConnectOption('context', null));
+        $config->setIsSecure($this->getConnectOption('ssl', true));
+
+        $this->connection = AMQPConnectionFactory::create($config);
 
         $this->channel = $this->connection->channel();
     }
