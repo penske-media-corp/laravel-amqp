@@ -44,16 +44,22 @@ class Request extends Context
         $config->setIoType($this->getConnectOption('io_type', AMQPConnectionConfig::IO_TYPE_STREAM));
         $config->setInsist($this->getConnectOption('insist', false));
         $config->setLoginMethod($this->getConnectOption('login_method', AMQPConnectionConfig::AUTH_AMQPPLAIN));
-        $config->setLoginResponse($this->getConnectOption('login_response', null));
         $config->setLocale($this->getConnectOption('locale', 'en_US'));
         $config->setConnectionTimeout($this->getConnectOption('connection_timeout', 3.0));
         $config->setReadTimeout($this->getConnectOption('read_timeout', 3.0));
         $config->setWriteTimeout($this->getConnectOption('write_timeout', 3.0));
         $config->setKeepalive($this->getConnectOption('keepalive', false));
         $config->setHeartbeat($this->getConnectOption('heartbeat', 0));
-
-        $config->setStreamContext($this->getConnectOption('context', null));
         $config->setIsSecure($this->getConnectOption('ssl', true));
+
+        // Conditionals.
+        if (!empty($this->getConnectOption('login_response', null))) {
+            $config->setLoginResponse($this->getConnectOption('login_response'));
+        }
+
+        if (!empty($this->getConnectOption('context', null))) {
+            $config->setStreamContext($this->getConnectOption('context', null));
+        }
 
         $this->connection = AMQPConnectionFactory::create($config);
 
