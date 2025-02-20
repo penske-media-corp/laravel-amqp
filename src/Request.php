@@ -51,14 +51,10 @@ class Request extends Context
         $config->setKeepalive($this->getConnectOption('keepalive', false));
         $config->setHeartbeat($this->getConnectOption('heartbeat', 0));
         $config->setIsSecure($this->getConnectOption('ssl', true));
+        $config->setStreamContext($this->getConnectOption('context', null));
 
-        // Conditionals.
         if (!empty($this->getConnectOption('login_response', null))) {
             $config->setLoginResponse($this->getConnectOption('login_response'));
-        }
-
-        if (!empty($this->getConnectOption('context', null))) {
-            $config->setStreamContext($this->getConnectOption('context', null));
         }
 
         $this->connection = AMQPConnectionFactory::create($config);
