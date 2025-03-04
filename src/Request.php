@@ -50,8 +50,15 @@ class Request extends Context
         $config->setWriteTimeout($this->getConnectOption('write_timeout', 3.0));
         $config->setKeepalive($this->getConnectOption('keepalive', false));
         $config->setHeartbeat($this->getConnectOption('heartbeat', 0));
-        $config->setIsSecure($this->getConnectOption('ssl', true));
-        $config->setStreamContext($this->getConnectOption('context', null));
+        $config->setChannelRPCTimeout($this->getConnectOption('channel_rpc_timeout', 0.0));
+
+        /**
+         * Set Stream connection specific options.
+         */
+        if ($config->getIoType() === AMQPConnectionConfig::IO_TYPE_STREAM) {
+            $config->setIsSecure($this->getConnectOption('ssl', false));
+            $config->setStreamContext($this->getConnectOption('context', null));
+        }
 
         if (!empty($this->getConnectOption('login_response', null))) {
             $config->setLoginResponse($this->getConnectOption('login_response'));
